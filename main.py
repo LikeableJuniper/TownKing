@@ -1,15 +1,18 @@
 import pygame as pg
 
 pg.init()
+pg.font.init()
 screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+font = pg.font.Font(None, 25)
 
 
 class Button:
-    def __init__(self, pos, dimensions, defColor, hoverColor, onClick=None):
+    def __init__(self, pos, dimensions, defColor, hoverColor, text="", onClick=None):
         self.pos = pos
         self.dimensions = dimensions
         self.defColor = defColor
         self.hoverColor = hoverColor
+        self.text = text
         self.onClick = onClick
         self.hovered = False
     
@@ -25,6 +28,10 @@ class Button:
             pg.draw.rect(screen, self.defColor, self.pos+self.dimensions)
             self.hovered = False
 
+        text = font.render(self.text, True, (0, 0, 0))
+        text_rect = text.get_rect(center=(self.pos[0]+self.dimensions[0]/2, self.pos[1]+self.dimensions[1]/2))
+        screen.blit(text, text_rect)
+
 
 def exitGame():
     global playing
@@ -32,7 +39,7 @@ def exitGame():
     playing = False
 
 
-buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), onClick=exitGame)]
+buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "exit", onClick=exitGame)]
 
 playing = True
 while playing:
