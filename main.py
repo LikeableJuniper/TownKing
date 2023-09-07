@@ -33,13 +33,25 @@ class Button:
         screen.blit(text, text_rect)
 
 
+class Input(Button):
+    def __init__(self):
+        super(Button)
+        self.value = ""
+    
+    def __call__(self, inputs):
+        for keypress in inputs:
+            self.value += keypress
+
 def exitGame():
     global playing
     pg.quit()
     playing = False
 
+inputFields: list[Input] = []
+lastFocused = None # Index of last focused on input field
+print(Input())
 
-buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "exit", onClick=exitGame)]
+buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=exitGame)]
 
 playing = True
 while playing:
