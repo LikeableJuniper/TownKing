@@ -6,11 +6,16 @@ screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 font = pg.font.Font(None, 25)
 
 
-class Button:
-    def __init__(self, pos, dimensions, defColor, hoverColor, text="", onClick=None):
+class Rectangle:
+    def __init__(self, pos, dimensions, color):
         self.pos = pos
         self.dimensions = dimensions
-        self.defColor = defColor
+        self.color = color
+
+
+class Button(Rectangle):
+    def __init__(self, pos, dimensions, color, hoverColor, text="", onClick=None):
+        super().__init__(pos, dimensions, color)
         self.hoverColor = hoverColor
         self.text = text
         self.onClick = onClick
@@ -25,7 +30,7 @@ class Button:
             pg.draw.rect(screen, self.hoverColor, self.pos+self.dimensions)
             self.hovered = True
         else:
-            pg.draw.rect(screen, self.defColor, self.pos+self.dimensions)
+            pg.draw.rect(screen, self.color, self.pos+self.dimensions)
             self.hovered = False
 
         text = font.render(self.text, True, (0, 0, 0))
@@ -33,23 +38,33 @@ class Button:
         screen.blit(text, text_rect)
 
 
-class Input(Button):
-    def __init__(self):
-        super(Button)
+class Input(Rectangle):
+    def __init__(self, pos, dimensions, color):
+        super().__init__(pos, dimensions, color)
         self.value = ""
     
     def __call__(self, inputs):
         for keypress in inputs:
-            self.value += keypress
+            if keypress == pg.K_BACKSPACE:
+                self.value = self.value[:-1]
+            else:
+                self.value += pg.key.name(keypress)
+    
+    def render(self, screen):
+        pg.draw.rect(screen, self.color, self.pos+self.dimensions)
+
+        text = font.render(self.value, True, (0, 0, 0))
+        text_rect = text.get_rect(center=(self.pos[0]+self.dimensions[0]/2, self.pos[1]+self.dimensions[1]/2))
+        screen.blit(text, text_rect)
+
 
 def exitGame():
     global playing
     pg.quit()
     playing = False
 
-inputFields: list[Input] = []
-lastFocused = None # Index of last focused on input field
-print(Input())
+inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100))]
+lastFocused = 0 # Index of last focused on input field
 
 buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=exitGame)]
 
@@ -61,6 +76,15 @@ while playing:
 
     for button in buttons:
         button.render(screen, mousePos)
+    
+    pressed = pg.key.get_pressed()
+    for i, inputField in enumerate(inputFields):
+        inputField.render(screen)
+        print("rendered")
+        if lastFocused == i:
+            print("in press")
+            inputField(pressed)
+
 
     #TODO: Add all game code here, none after input checks to prevent errors
 
