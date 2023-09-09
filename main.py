@@ -44,11 +44,12 @@ class Input(Rectangle):
         self.value = ""
     
     def __call__(self, inputs):
-        for keypress in inputs:
-            if keypress == pg.K_BACKSPACE:
-                self.value = self.value[:-1]
-            else:
-                self.value += pg.key.name(keypress)
+        for key, pressed in enumerate(inputs):
+            if pressed:
+                if key == pg.K_BACKSPACE:
+                    self.value = self.value[:-1]
+                else:
+                    self.value += pg.key.name(key)
     
     def render(self, screen):
         pg.draw.rect(screen, self.color, self.pos+self.dimensions)
