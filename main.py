@@ -5,6 +5,9 @@ pg.font.init()
 screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 font = pg.font.Font(None, 25)
 
+alphabet = [list("abcdefghijklmnopqrstuvwxyz"), list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
+numbers = list("0123456789")
+
 
 class Rectangle:
     def __init__(self, pos, dimensions, color):
@@ -42,16 +45,26 @@ class Input(Rectangle):
     def __init__(self, pos, dimensions, color):
         super().__init__(pos, dimensions, color)
         self.value = ""
+        self.lastInputs = [False] * 512
     
     def __call__(self, inputs):
-        for key, pressed in enumerate(inputs):
-            if pressed:
-                print(key)
-                if key == pg.K_BACKSPACE:
-                    self.value = self.value[:-1]
-                else:
-                    print(pg.key.name(key), key == pg.K_w)
-                    self.value += pg.key.name(key)
+        for i, char in enumerate(alphabet[int(inputs[pg.K_LSHIFT] or inputs[pg.K_RSHIFT])]):
+            absIndex = pg.K_a + i
+            if inputs[absIndex] and not self.lastInputs[absIndex]:
+                self.value += char
+        
+        for i, num in enumerate(numbers):
+            absIndex = pg.K_0 + i
+            if inputs[absIndex] and not self.lastInputs[absIndex]:
+                self.value += num
+        
+        # To save the backspace input to self.lastInput, -1 is used as pg.K_BACKSPACE returns a value already used by the letter "i"
+        if inputs[pg.K_BACKSPACE]:
+            if not self.lastInputs[pg.K_BACKSPACE]:
+                self.value = self.value[:-1]
+        
+        self.lastInputs = inputs
+
     
     def render(self, screen):
         pg.draw.rect(screen, self.color, self.pos+self.dimensions)
@@ -65,6 +78,7 @@ def exitGame():
     global playing
     pg.quit()
     playing = False
+
 
 inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100))]
 lastFocused = 0 # Index of last focused on input field
