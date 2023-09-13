@@ -46,9 +46,11 @@ class Input(Rectangle):
     def __call__(self, inputs):
         for key, pressed in enumerate(inputs):
             if pressed:
+                print(key)
                 if key == pg.K_BACKSPACE:
                     self.value = self.value[:-1]
                 else:
+                    print(pg.key.name(key), key == pg.K_w)
                     self.value += pg.key.name(key)
     
     def render(self, screen):
@@ -81,9 +83,7 @@ while playing:
     pressed = pg.key.get_pressed()
     for i, inputField in enumerate(inputFields):
         inputField.render(screen)
-        print("rendered")
         if lastFocused == i:
-            print("in press")
             inputField(pressed)
 
 
