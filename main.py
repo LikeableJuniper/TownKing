@@ -48,19 +48,22 @@ class Input(Rectangle):
     
     def __call__(self, inputs):
         for i, char in enumerate(alphabet):
-            if inputs[i+pg.K_a] and (self.lastInput != i):
-                self.value += char
-                self.lastInput = i
-            
+            if inputs[i+pg.K_a]:
+                if self.lastInput != i:
+                    self.value += char
+                    self.lastInput = i
+                
             elif self.lastInput == i:
+                print("reset")
                 self.lastInput = None
         
+        # To save the backspace input to self.lastInput, -1 is used as pg.K_BACKSPACE returns a value already used by the letter "i"
         if inputs[pg.K_BACKSPACE]:
-            if (self.lastInput != pg.K_BACKSPACE):
+            if (self.lastInput != -1):
                 self.value = self.value[:-1]
-                self.lastInput = pg.K_BACKSPACE
-            else:
-                self.lastInput = None
+                self.lastInput = -1
+        elif self.lastInput == -1:
+            self.lastInput = None
 
     
     def render(self, screen):
