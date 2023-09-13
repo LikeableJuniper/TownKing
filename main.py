@@ -58,7 +58,6 @@ class Input(Rectangle):
             if inputs[absIndex] and not self.lastInputs[absIndex]:
                 self.value += num
         
-        # To save the backspace input to self.lastInput, -1 is used as pg.K_BACKSPACE returns a value already used by the letter "i"
         if inputs[pg.K_BACKSPACE]:
             if not self.lastInputs[pg.K_BACKSPACE]:
                 self.value = self.value[:-1]
