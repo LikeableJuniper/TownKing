@@ -48,7 +48,6 @@ class Input(Rectangle):
         self.lastInputs = [False] * 512
     
     def __call__(self, inputs):
-        print(len(inputs))
         for i, char in enumerate(alphabet[int(inputs[pg.K_LSHIFT] or inputs[pg.K_RSHIFT])]):
             absIndex = pg.K_a + i
             if inputs[absIndex] and not self.lastInputs[absIndex]:
