@@ -5,6 +5,8 @@ pg.font.init()
 screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 font = pg.font.Font(None, 25)
 
+alphabet = list("abcdefghijklmnopqrstuvwxyz")
+
 
 class Rectangle:
     def __init__(self, pos, dimensions, color):
@@ -42,14 +44,24 @@ class Input(Rectangle):
     def __init__(self, pos, dimensions, color):
         super().__init__(pos, dimensions, color)
         self.value = ""
+        self.lastInput: int = None
     
     def __call__(self, inputs):
-        for key, pressed in enumerate(inputs):
-            if pressed:
-                if key == pg.K_BACKSPACE:
-                    self.value = self.value[:-1]
-                else:
-                    self.value += pg.key.name(key)
+        for i, char in enumerate(alphabet):
+            if inputs[i+pg.K_a] and (self.lastInput != i):
+                self.value += char
+                self.lastInput = i
+            
+            elif self.lastInput == i:
+                self.lastInput = None
+        
+        if inputs[pg.K_BACKSPACE]:
+            if (self.lastInput != pg.K_BACKSPACE):
+                self.value = self.value[:-1]
+                self.lastInput = pg.K_BACKSPACE
+            else:
+                self.lastInput = None
+
     
     def render(self, screen):
         pg.draw.rect(screen, self.color, self.pos+self.dimensions)
@@ -81,9 +93,7 @@ while playing:
     pressed = pg.key.get_pressed()
     for i, inputField in enumerate(inputFields):
         inputField.render(screen)
-        print("rendered")
         if lastFocused == i:
-            print("in press")
             inputField(pressed)
 
 
