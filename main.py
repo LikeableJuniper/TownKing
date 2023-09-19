@@ -5,7 +5,7 @@ pg.font.init()
 screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 font = pg.font.Font(None, 25)
 
-V_LOC = 1
+V_LOC = 0
 EXIT = -1 # Anytime V_LOC is set to -1, exit the game
 LOGIN = 0
 GAME = 1
@@ -52,9 +52,10 @@ class Button(Rectangle):
 
 
 class Input(Rectangle):
-    def __init__(self, pos, dimensions, color):
+    def __init__(self, pos, dimensions, color, text):
         super().__init__(pos, dimensions, color)
         self.value = ""
+        self.text = text
         self.lastInputs = [False] * 512
     
     def __call__(self, inputs):
@@ -78,14 +79,20 @@ class Input(Rectangle):
     def render(self, screen):
         pg.draw.rect(screen, self.color, self.pos+self.dimensions)
 
+        # Rendering value of input
         text = font.render(self.value, True, (0, 0, 0))
         text_rect = text.get_rect(center=(self.pos[0]+self.dimensions[0]/2, self.pos[1]+self.dimensions[1]/2))
+        screen.blit(text, text_rect)
+
+        # Render pre-text
+        text = font.render(self.text, True, (0, 0, 0))
+        text_rect = text.get_rect(topright=self.pos)
         screen.blit(text, text_rect)
 
 
 def game():
     global V_LOC
-    inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100))]
+    inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100), "A:")]
     lastFocused = 0 # Index of last focused on input field
 
     buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(-1))]
@@ -121,7 +128,7 @@ def game():
 
 def login():
     global V_LOC
-    inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100))]
+    inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100), "Name: ")]
     lastFocused = 0 # Index of last focused on input field
 
     buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(-1))]
