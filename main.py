@@ -5,8 +5,18 @@ pg.font.init()
 screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 font = pg.font.Font(None, 25)
 
+V_LOC = 1
+EXIT = -1 # Anytime V_LOC is set to -1, exit the game
+LOGIN = 0
+GAME = 1
+
 alphabet = [list("abcdefghijklmnopqrstuvwxyz"), list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
 numbers = list("0123456789")
+
+
+def locChange(newVal):
+    global V_LOC
+    V_LOC = newVal
 
 
 class Rectangle:
@@ -73,42 +83,79 @@ class Input(Rectangle):
         screen.blit(text, text_rect)
 
 
-def exitGame():
-    global playing
-    pg.quit()
-    playing = False
+def game():
+    global V_LOC
+    inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100))]
+    lastFocused = 0 # Index of last focused on input field
 
+    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(-1))]
 
-inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100))]
-lastFocused = 0 # Index of last focused on input field
+    while V_LOC == GAME:
+        screen.fill((100, 100, 100))
+        mousePos = pg.mouse.get_pos()
+        lclick = pg.mouse.get_pressed()[0]
 
-buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=exitGame)]
-
-playing = True
-while playing:
-    screen.fill((100, 100, 100))
-    mousePos = pg.mouse.get_pos()
-    lclick = pg.mouse.get_pressed()[0]
-
-    for button in buttons:
-        button.render(screen, mousePos)
-    
-    pressed = pg.key.get_pressed()
-    for i, inputField in enumerate(inputFields):
-        inputField.render(screen)
-        if lastFocused == i:
-            inputField(pressed)
-
-
-    #TODO: Add all game code here, none after input checks to prevent errors
-
-    pg.display.update()
-
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            exitGame()
+        for button in buttons:
+            button.render(screen, mousePos)
         
-        # Buttons
-        if lclick:
-            for button in buttons:
-                button()
+        pressed = pg.key.get_pressed()
+        for i, inputField in enumerate(inputFields):
+            inputField.render(screen)
+            if lastFocused == i:
+                inputField(pressed)
+
+
+        #TODO: Add all game code here, none after input checks to prevent errors
+
+        pg.display.update()
+
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                V_LOC = -1
+            
+            # Buttons
+            if lclick:
+                for button in buttons:
+                    button()
+
+
+def login():
+    global V_LOC
+    inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100))]
+    lastFocused = 0 # Index of last focused on input field
+
+    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(-1))]
+
+    while V_LOC == LOGIN:
+        screen.fill((100, 100, 100))
+        mousePos = pg.mouse.get_pos()
+        lclick = pg.mouse.get_pressed()[0]
+
+        for button in buttons:
+            button.render(screen, mousePos)
+        
+        pressed = pg.key.get_pressed()
+        for i, inputField in enumerate(inputFields):
+            inputField.render(screen)
+            if lastFocused == i:
+                inputField(pressed)
+
+
+        #TODO: Add all game code here, none after input checks to prevent errors
+
+        pg.display.update()
+
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                V_LOC = -1
+            
+            # Buttons
+            if lclick:
+                for button in buttons:
+                    button()
+
+
+funcs = [login, game]
+
+while V_LOC > EXIT: # When V_LOC reaches -1, exit the game
+    funcs[V_LOC]()
