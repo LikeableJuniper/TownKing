@@ -1,6 +1,7 @@
 import pygame as pg
 from hashlib import sha256
 import os
+import json
 
 pg.init()
 pg.font.init()
@@ -16,16 +17,12 @@ alphabet = [list("abcdefghijklmnopqrstuvwxyz"), list("ABCDEFGHIJKLMNOPQRSTUVWXYZ
 numbers = list("0123456789")
 
 
-def createSave(username, password):
+def createSave(username: str, password: str):
     if not os.path.isdir("Saves"):
         os.mkdir("Saves")
     with open(f"Saves/{username}.json", "x") as f:
-        f.write\
-    ("""
-        {
-                   
-        }
-    """)
+        saveData = {"username": username, "password": str(sha256(bytes(password.encode())).hexdigest())}
+        json.dump(saveData, f)
 
 
 def locChange(newVal):
@@ -133,11 +130,6 @@ def game():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 V_LOC = -1
-            
-            # Buttons
-            if lclick:
-                for button in buttons:
-                    button()
 
 
 def login():
@@ -169,11 +161,6 @@ def login():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 V_LOC = -1
-            
-            # Buttons
-            if lclick:
-                for button in buttons:
-                    button()
 
 
 funcs = [login, game]
