@@ -31,7 +31,7 @@ def locChange(newVal):
 
 
 class Rectangle:
-    def __init__(self, pos, dimensions, color):
+    def __init__(self, pos: list[int, int], dimensions: list[int, int], color):
         self.pos = pos
         self.dimensions = dimensions
         self.color = color
@@ -99,42 +99,15 @@ class Input(Rectangle):
         text = font.render(self.text, True, (0, 0, 0))
         text_rect = text.get_rect(midright=(self.pos[0], self.pos[1]+self.dimensions[1]/2))
         screen.blit(text, text_rect)
-
-
-def game():
-    global V_LOC
-    inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100), "A:")]
-    lastFocused = 0 # Index of last focused on input field
-
-    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(-1))]
-
-    while V_LOC == GAME:
-        screen.fill((100, 100, 100))
-        mousePos = pg.mouse.get_pos()
-        lclick = pg.mouse.get_pressed()[0]
-
-        for button in buttons:
-            button.render(screen, mousePos)
-        
-        pressed = pg.key.get_pressed()
-        for i, inputField in enumerate(inputFields):
-            inputField.render(screen)
-            if lastFocused == i:
-                inputField(pressed)
-
-
-        #TODO: Add all game code here, none after input checks to prevent errors
-
-        pg.display.update()
-
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                V_LOC = -1
+    
+    def checkClicked(self, mousePos: list[int, int]):
+        if self.pos[0] < mousePos[0] < self.pos[0] + self.dimensions[0] and self.pos[1] < mousePos[1] < self.pos[1] + self.dimensions[1]:
+            return True
 
 
 def login():
     global V_LOC
-    inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100), "Name: ")]
+    inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100), "Name: "), Input([800, 150], [150, 50], (200, 200, 100), "Pswd: ")]
     lastFocused = 0 # Index of last focused on input field
 
     buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(-1))]
@@ -146,10 +119,15 @@ def login():
 
         for button in buttons:
             button.render(screen, mousePos)
+            if lclick:
+                button()
         
         pressed = pg.key.get_pressed()
         for i, inputField in enumerate(inputFields):
             inputField.render(screen)
+            if lclick:
+                if inputField.checkClicked(mousePos):
+                    lastFocused = i
             if lastFocused == i:
                 inputField(pressed)
 
@@ -163,7 +141,7 @@ def login():
                 V_LOC = -1
 
 
-funcs = [login, game]
+funcs = [login]
 
 while V_LOC > EXIT: # When V_LOC reaches -1, exit the game
     funcs[V_LOC]()
