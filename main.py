@@ -1,4 +1,6 @@
 import pygame as pg
+from hashlib import sha256
+import os
 
 pg.init()
 pg.font.init()
@@ -12,6 +14,18 @@ GAME = 1
 
 alphabet = [list("abcdefghijklmnopqrstuvwxyz"), list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
 numbers = list("0123456789")
+
+
+def createSave(username, password):
+    if not os.path.isdir("Saves"):
+        os.mkdir("Saves")
+    with open(f"Saves/{username}.json", "x") as f:
+        f.write\
+    ("""
+        {
+                   
+        }
+    """)
 
 
 def locChange(newVal):
@@ -86,7 +100,7 @@ class Input(Rectangle):
 
         # Render pre-text
         text = font.render(self.text, True, (0, 0, 0))
-        text_rect = text.get_rect(topright=self.pos)
+        text_rect = text.get_rect(midright=(self.pos[0], self.pos[1]+self.dimensions[1]/2))
         screen.blit(text, text_rect)
 
 
@@ -166,3 +180,5 @@ funcs = [login, game]
 
 while V_LOC > EXIT: # When V_LOC reaches -1, exit the game
     funcs[V_LOC]()
+
+
