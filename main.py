@@ -13,6 +13,10 @@ EXIT = -1 # Anytime V_LOC is set to -1, exit the game
 LOGIN = 0
 GAME = 1
 
+class ButtonTypes:
+    DEFAULT = 0
+    CREATESAVE = 1
+
 alphabet = [list("abcdefghijklmnopqrstuvwxyz"), list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
 numbers = list("0123456789")
 
@@ -23,6 +27,10 @@ def createSave(username: str, password: str):
     with open(f"Saves/{username}.json", "x") as f:
         saveData = {"username": username, "password": str(sha256(bytes(password.encode())).hexdigest())}
         json.dump(saveData, f)
+
+
+def loadSave(username: str, password: str):
+    pass
 
 
 def locChange(newVal):
@@ -38,14 +46,17 @@ class Rectangle:
 
 
 class Button(Rectangle):
-    def __init__(self, pos, dimensions, color, hoverColor, text="", onClick=None):
+    def __init__(self, pos, dimensions, color, hoverColor, text="", onClick=None, buttonType=ButtonTypes.DEFAULT):
         super().__init__(pos, dimensions, color)
         self.hoverColor = hoverColor
         self.text = text
         self.onClick = onClick
         self.hovered = False
+        self.buttonType = buttonType
     
-    def __call__(self):
+    def __call__(self, **kwargs):
+        if self.buttonType == ButtonTypes.CREATESAVE:
+            createSave(kwargs["username"], kwargs["password"])
         if self.hovered:
             self.onClick()
     
@@ -106,7 +117,7 @@ class Input(Rectangle):
 
 
 def login():
-    global V_LOC
+    global V_LOC, inputFields
     inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100), "Name: "), Input([800, 150], [150, 50], (200, 200, 100), "Pswd: ")]
     lastFocused = 0 # Index of last focused on input field
 
