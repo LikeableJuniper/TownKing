@@ -34,12 +34,13 @@ errorMessages = ["The password is incorrect.", "No save exists with that usernam
 
 
 def createSave(username: str, password: str):
+    """Function to create a save in "Saves/" directory. Returns data in the following format: (function value, error code)"""
     if not (username and password):
-        return AccountErrors.EMPTY_CREDENTIALS
+        return None, AccountErrors.EMPTY_CREDENTIALS
     if not os.path.isdir("Saves"):
         os.mkdir("Saves")
     if f"{username}.json" in os.listdir("Saves"):
-        return AccountErrors.USER_EXISTS
+        return None, AccountErrors.USER_EXISTS
     with open(f"Saves/{username}.json", "x") as f:
         saveData = {"username": username, "password": str(sha256(bytes(password.encode())).hexdigest())}
         json.dump(saveData, f)
@@ -47,12 +48,13 @@ def createSave(username: str, password: str):
 
 
 def loadSave(username: str, password: str):
+    """Function to load a save. Returns data in the following format: (function value, error code)"""
     if f"{username}.json" not in os.listdir("Saves"):
-        return AccountErrors.NO_SAVE
+        return None, AccountErrors.NO_SAVE
     with open(f"Saves/{username}.json", "r") as f:
         gameData = json.load(f)
     if sha256(bytes(password.encode())).hexdigest() != gameData["password"]:
-        return AccountErrors.PASSWORD_INCORRECT
+        return None, AccountErrors.PASSWORD_INCORRECT
     return gameData
 
 
@@ -177,10 +179,10 @@ def login():
             button.render(screen, mousePos)
             if lclick:
                 errCode = button(username=inputFields[0].value, password=inputFields[1].value)
-                if type(errCode) == dict:
+                if type(errCode[0]) == dict:
                     gameData = errCode
                     continue
-                if errCode < 0:
+                if errCode[1] < 0:
                     labels[0].changeText(errorMessages[errCode])
         
         for label in labels:
