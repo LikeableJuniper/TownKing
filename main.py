@@ -117,7 +117,7 @@ class Input(Rectangle):
 
 
 def login():
-    global V_LOC, inputFields
+    global V_LOC
     inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100), "Name: "), Input([800, 150], [150, 50], (200, 200, 100), "Pswd: ")]
     lastFocused = 0 # Index of last focused on input field
 
