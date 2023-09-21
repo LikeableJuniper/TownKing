@@ -9,9 +9,10 @@ screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
 font = pg.font.Font(None, 25)
 
 V_LOC = 0
-EXIT = -1 # Anytime V_LOC is set to -1, exit the game
-LOGIN = 0
-GAME = 1
+class Locations:
+    EXIT = -1 # Anytime V_LOC is set to -1, exit the game
+    LOGIN = 0
+    GAME = 1
 
 class ButtonTypes:
     DEFAULT = 0
@@ -168,7 +169,7 @@ def login():
 
     labels: list[Label] = [Label([500, 310], "")]
 
-    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(EXIT)), Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE), Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Load Save", buttonType=ButtonTypes.LOADSAVE)]
+    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(EXIT)), Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE), Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)]
 
     while V_LOC == LOGIN:
         screen.fill((100, 100, 100))
@@ -181,7 +182,7 @@ def login():
                 errCode = button(username=inputFields[0].value, password=inputFields[1].value)
                 if type(errCode[0]) == dict:
                     gameData = errCode
-                    continue
+                    V_LOC = Locations.GAME
                 if errCode[1] < 0:
                     labels[0].changeText(errorMessages[errCode])
         
