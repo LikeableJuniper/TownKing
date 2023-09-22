@@ -33,6 +33,8 @@ numbers = list("0123456789")
 
 errorMessages = ["The password is incorrect.", "No save exists with that username.", "That username is already taken.", "Username or password cannot be empty."]
 
+gameData = {}
+
 
 def createSave(username: str, password: str):
     """Function to create a save in "Saves/" directory. Returns data in the following format: (function value, error code)"""
@@ -45,7 +47,7 @@ def createSave(username: str, password: str):
     with open(f"Saves/{username}.json", "x") as f:
         saveData = {"username": username, "password": str(sha256(bytes(password.encode())).hexdigest())}
         json.dump(saveData, f)
-    return AccountErrors.PASSED
+    return None, AccountErrors.PASSED
 
 
 def loadSave(username: str, password: str):
@@ -56,7 +58,7 @@ def loadSave(username: str, password: str):
         gameData = json.load(f)
     if sha256(bytes(password.encode())).hexdigest() != gameData["password"]:
         return None, AccountErrors.PASSWORD_INCORRECT
-    return gameData
+    return gameData, AccountErrors.PASSED
 
 
 def locChange(newVal):
@@ -104,7 +106,7 @@ class Button(Rectangle):
             elif self.buttonType == ButtonTypes.LOADSAVE:
                 return loadSave(kwargs["username"], kwargs["password"])
             self.onClick()
-        return 0
+        return None, AccountErrors.PASSED
     
     def render(self, screen, mousePos):
         if self.pos[0] < mousePos[0] < self.pos[0] + self.dimensions[0] and self.pos[1] < mousePos[1] < self.pos[1] + self.dimensions[1]:
@@ -163,15 +165,16 @@ class Input(Rectangle):
 
 
 def login():
+    """Renders the login window. Returns gameData after closing."""
     global V_LOC
     inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100), "Name: "), Input([800, 150], [150, 50], (200, 200, 100), "Pswd: ")]
     lastFocused = 0 # Index of last focused on input field
 
     labels: list[Label] = [Label([500, 310], "")]
 
-    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(EXIT)), Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE), Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)]
+    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(Locations.EXIT)), Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE), Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)]
 
-    while V_LOC == LOGIN:
+    while V_LOC == Locations.LOGIN:
         screen.fill((100, 100, 100))
         mousePos = pg.mouse.get_pos()
         lclick = pg.mouse.get_pressed()[0]
@@ -181,10 +184,10 @@ def login():
             if lclick:
                 errCode = button(username=inputFields[0].value, password=inputFields[1].value)
                 if type(errCode[0]) == dict:
-                    gameData = errCode
                     V_LOC = Locations.GAME
+                    return errCode[0]
                 if errCode[1] < 0:
-                    labels[0].changeText(errorMessages[errCode])
+                    labels[0].changeText(errorMessages[errCode[1]])
         
         for label in labels:
             label.render(screen)
@@ -210,7 +213,7 @@ def login():
 
 funcs = [login]
 
-while V_LOC > EXIT: # When V_LOC reaches -1, exit the game
-    funcs[V_LOC]()
+while V_LOC > Locations.EXIT: # When V_LOC reaches -1, exit the game
+    gameData = funcs[V_LOC]()
 
-
+print(gameData)
