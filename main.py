@@ -2,6 +2,7 @@ import pygame as pg
 from hashlib import sha256
 import os
 import json
+from vectors import Vector
 
 pg.init()
 pg.font.init()
@@ -27,51 +28,6 @@ class AccountErrors:
     USER_EXISTS = -2
     NO_SAVE = -3
     PASSWORD_INCORRECT = -4
-
-
-alphabet = [list("abcdefghijklmnopqrstuvwxyz"), list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
-numbers = list("0123456789")
-
-errorMessages = ["The password is incorrect.", "No save exists with that username.", "That username is already taken.", "Username or password cannot be empty."]
-
-gameData = {}
-
-
-def createSave(username: str, password: str):
-    """Function to create a save in "Saves/" directory. Returns data in the following format: (function value, error code)"""
-    if not (username and password):
-        return None, AccountErrors.EMPTY_CREDENTIALS
-    if not os.path.isdir("Saves"):
-        os.mkdir("Saves")
-    if f"{username}.json" in os.listdir("Saves"):
-        return None, AccountErrors.USER_EXISTS
-    with open(f"Saves/{username}.json", "x") as f:
-        saveData = {"username": username, "password": str(sha256(bytes(password.encode())).hexdigest())}
-        json.dump(saveData, f)
-    return None, AccountErrors.PASSED
-
-
-def loadSave(username: str, password: str):
-    """Function to load a save. Returns data in the following format: (function value, error code)"""
-    if f"{username}.json" not in os.listdir("Saves"):
-        return None, AccountErrors.NO_SAVE
-    with open(f"Saves/{username}.json", "r") as f:
-        gameData = json.load(f)
-    if sha256(bytes(password.encode())).hexdigest() != gameData["password"]:
-        return None, AccountErrors.PASSWORD_INCORRECT
-    # Load button element in "field" as class from dict
-    dictField = gameData["field"]
-    classField: list[list[Button]] = [[None]*len(gameData["field"][0])]*len(gameData["field"])
-    for x, column in enumerate(dictField):
-        for y, element in enumerate(column):
-            classField[x][y] = Button(dictValue=element)
-
-    return gameData, AccountErrors.PASSED
-
-
-def locChange(newVal):
-    global V_LOC
-    V_LOC = newVal
 
 
 class Rectangle:
@@ -177,6 +133,61 @@ class Input(Rectangle):
             return True
 
 
+alphabet = [list("abcdefghijklmnopqrstuvwxyz"), list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
+numbers = list("0123456789")
+
+fieldSize = [20, 20]
+fieldDimensions = [600, 600]
+offset = Vector(100, 300)
+buttonSize = [fieldDimensions[i]/fieldSize[i] for i in range(2)]
+
+errorMessages = ["The password is incorrect.", "No save exists with that username.", "That username is already taken.", "Username or password cannot be empty."]
+
+gameData: dict[str, str, list[list[Button]]] = {}
+
+
+def createSave(username: str, password: str):
+    """Function to create a save in "Saves/" directory. Returns data in the following format: (function value, error code)"""
+    if not (username and password):
+        return None, AccountErrors.EMPTY_CREDENTIALS
+    if not os.path.isdir("Saves"):
+        os.mkdir("Saves")
+    if f"{username}.json" in os.listdir("Saves"):
+        return None, AccountErrors.USER_EXISTS
+    with open(f"Saves/{username}.json", "x") as f:
+        field = []
+        for x in range(fieldSize[0]):
+            field.append([])
+            for y in range(fieldSize[1]):
+                field[x].append([None]) # NOne is a place holder for button element during main loop
+        saveData = {"username": username, "password": str(sha256(bytes(password.encode())).hexdigest()), "field": field}
+        json.dump(saveData, f)
+    return None, AccountErrors.PASSED
+
+
+def loadSave(username: str, password: str):
+    """Function to load a save. Returns data in the following format: (function value, error code)"""
+    if f"{username}.json" not in os.listdir("Saves"):
+        return None, AccountErrors.NO_SAVE
+    with open(f"Saves/{username}.json", "r") as f:
+        gameData = json.load(f)
+    if sha256(bytes(password.encode())).hexdigest() != gameData["password"]:
+        return None, AccountErrors.PASSWORD_INCORRECT
+    # Load button element in "field" as class from dict
+    dictField = gameData["field"]
+    classField: list[list[Button]] = [[None]*len(gameData["field"][0])]*len(gameData["field"])
+    for x, column in enumerate(dictField):
+        for y, element in enumerate(column):
+            classField[x][y] = Button(dictValue=element)
+
+    return gameData, AccountErrors.PASSED
+
+
+def locChange(newVal):
+    global V_LOC
+    V_LOC = newVal
+
+
 def login(gameData):
     """Renders the login window. Returns gameData after closing."""
     global V_LOC
@@ -251,8 +262,8 @@ def mainGame(gameData):
             label.render(screen)
         
         for column in gameData["field"]:
-            for row in column:
-                row.render(screen, mousePos)
+            for element in column:
+                element.render(screen, mousePos)
         
         pressed = pg.key.get_pressed()
         for i, inputField in enumerate(inputFields):
