@@ -18,6 +18,7 @@ class ButtonTypes:
     DEFAULT = 0
     CREATESAVE = 1
     LOADSAVE = 2
+    EXIT = 3
 
 
 class AccountErrors:
@@ -58,6 +59,13 @@ def loadSave(username: str, password: str):
         gameData = json.load(f)
     if sha256(bytes(password.encode())).hexdigest() != gameData["password"]:
         return None, AccountErrors.PASSWORD_INCORRECT
+    # Load button element in "field" as class from dict
+    dictField = gameData["field"]
+    classField: list[list[Button]] = [[None]*len(gameData["field"][0])]*len(gameData["field"])
+    for x, column in enumerate(dictField):
+        for y, element in enumerate(column):
+            classField[x][y] = Button(dictValue=element)
+
     return gameData, AccountErrors.PASSED
 
 
@@ -91,7 +99,9 @@ class Label:
 
 
 class Button(Rectangle):
-    def __init__(self, pos, dimensions, color, hoverColor, text="", onClick=lambda: None, buttonType=ButtonTypes.DEFAULT):
+    def __init__(self, pos=[], dimensions=[], color=(), hoverColor=(), text="", onClick=lambda: None, buttonType=ButtonTypes.DEFAULT, dictValue: dict=None):
+        if dictValue:
+            pos, dimensions, color, hoverColor, text, onClick, buttonType = dictValue.values()
         super().__init__(pos, dimensions, color)
         self.hoverColor = hoverColor
         self.text = text
@@ -105,8 +115,11 @@ class Button(Rectangle):
                 return createSave(kwargs["username"], kwargs["password"])
             elif self.buttonType == ButtonTypes.LOADSAVE:
                 return loadSave(kwargs["username"], kwargs["password"])
+            elif self.buttonType == ButtonTypes.EXIT:
+                locChange(Locations.EXIT)
+                return kwargs["gameData"], 0
             self.onClick()
-        return None, AccountErrors.PASSED
+        return None, 0
     
     def render(self, screen, mousePos):
         if self.pos[0] < mousePos[0] < self.pos[0] + self.dimensions[0] and self.pos[1] < mousePos[1] < self.pos[1] + self.dimensions[1]:
@@ -164,7 +177,7 @@ class Input(Rectangle):
             return True
 
 
-def login():
+def login(gameData):
     """Renders the login window. Returns gameData after closing."""
     global V_LOC
     inputFields: list[Input] = [Input([500, 150], [150, 50], (200, 200, 100), "Name: "), Input([800, 150], [150, 50], (200, 200, 100), "Pswd: ")]
@@ -172,7 +185,7 @@ def login():
 
     labels: list[Label] = [Label([500, 310], "")]
 
-    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(Locations.EXIT)), Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE), Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)]
+    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", onClick=lambda: locChange(Locations.EXIT), buttonType=ButtonTypes.EXIT), Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE), Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)]
 
     while V_LOC == Locations.LOGIN:
         screen.fill((100, 100, 100))
@@ -182,9 +195,10 @@ def login():
         for button in buttons:
             button.render(screen, mousePos)
             if lclick:
-                errCode = button(username=inputFields[0].value, password=inputFields[1].value)
+                errCode = button(username=inputFields[0].value, password=inputFields[1].value, gameData=gameData)
                 if type(errCode[0]) == dict:
-                    V_LOC = Locations.GAME
+                    if button.buttonType == ButtonTypes.LOADSAVE:
+                        V_LOC = Locations.GAME
                     return errCode[0]
                 if errCode[1] < 0:
                     labels[0].changeText(errorMessages[errCode[1]])
@@ -211,9 +225,57 @@ def login():
                 V_LOC = -1
 
 
-funcs = [login]
+def mainGame(gameData):
+    """Renders the main window. Returns gameData after closing."""
+    global V_LOC
+    inputFields: list[Input] = []
+    lastFocused = 0 # Index of last focused on input field
+
+    labels: list[Label] = []
+
+    buttons: list[Button] = [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)]
+
+    while V_LOC == Locations.GAME:
+        screen.fill((100, 100, 100))
+        mousePos = pg.mouse.get_pos()
+        lclick = pg.mouse.get_pressed()[0]
+
+        for button in buttons:
+            button.render(screen, mousePos)
+            if lclick:
+                errCode = button(gameData=gameData)
+                if type(errCode[0]) == dict:
+                    return errCode[0]
+        
+        for label in labels:
+            label.render(screen)
+        
+        for column in gameData["field"]:
+            for row in column:
+                row.render(screen, mousePos)
+        
+        pressed = pg.key.get_pressed()
+        for i, inputField in enumerate(inputFields):
+            inputField.render(screen)
+            if lclick:
+                if inputField.checkClicked(mousePos):
+                    lastFocused = i
+            if lastFocused == i:
+                inputField(pressed)
+
+
+        #TODO: Add all game code here, none after input checks to prevent errors
+
+        pg.display.update()
+
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                V_LOC = -1
+
+
+locationFuncs = [login, mainGame]
 
 while V_LOC > Locations.EXIT: # When V_LOC reaches -1, exit the game
-    gameData = funcs[V_LOC]()
+    gameData = locationFuncs[V_LOC](gameData)
 
 print(gameData)
