@@ -179,10 +179,11 @@ def loadSave(username: str, password: str):
     # Load button element in "field" as class from dict
     dictField = gameData["field"]
     classField: list[list[Button]] = [[[None, Buildings.EMPTY]]*len(gameData["field"][0])]*len(gameData["field"])
-    print(type(openBuilding))
     for x, column in enumerate(dictField):
         for y, elem in enumerate(column):
             classField[x][y][0] = Button(list(offset+[x*buttonSize[0], y*buttonSize[1]]), buttonSize, (255, 200, 140), (255, 200, 140), onClick=lambda: openBuilding([x, y]))
+    
+    gameData["field"] = classField
 
     return gameData, AccountErrors.PASSED
 
@@ -270,8 +271,8 @@ def mainGame(gameData):
             label.render(screen)
         
         for column in gameData["field"]:
-            for element in column:
-                element.render(screen, mousePos)
+            for row in column:
+                row[0].render(screen, mousePos)
         
         pressed = pg.key.get_pressed()
         for i, inputField in enumerate(inputFields):
