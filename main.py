@@ -21,13 +21,16 @@ class ButtonTypes:
     LOADSAVE = 2
     EXIT = 3
 
-
 class AccountErrors:
     PASSED = 0
     EMPTY_CREDENTIALS = -1
     USER_EXISTS = -2
     NO_SAVE = -3
     PASSWORD_INCORRECT = -4
+
+class Buildings:
+    EMPTY = 0
+    TOWNHALL = 1
 
 
 class Rectangle:
@@ -159,7 +162,7 @@ def createSave(username: str, password: str):
         for x in range(fieldSize[0]):
             field.append([])
             for y in range(fieldSize[1]):
-                field[x].append([None]) # NOne is a place holder for button element during main loop
+                field[x].append([None, Buildings.EMPTY]) # None is a placeholder for button element during main loop
         saveData = {"username": username, "password": str(sha256(bytes(password.encode())).hexdigest()), "field": field}
         json.dump(saveData, f)
     return None, AccountErrors.PASSED
@@ -175,10 +178,11 @@ def loadSave(username: str, password: str):
         return None, AccountErrors.PASSWORD_INCORRECT
     # Load button element in "field" as class from dict
     dictField = gameData["field"]
-    classField: list[list[Button]] = [[None]*len(gameData["field"][0])]*len(gameData["field"])
+    classField: list[list[Button]] = [[[None, Buildings.EMPTY]]*len(gameData["field"][0])]*len(gameData["field"])
+    print(type(openBuilding))
     for x, column in enumerate(dictField):
-        for y, element in enumerate(column):
-            classField[x][y] = Button(dictValue=element)
+        for y, elem in enumerate(column):
+            classField[x][y][0] = Button(list(offset+[x*buttonSize[0], y*buttonSize[1]]), buttonSize, (255, 200, 140), (255, 200, 140), onClick=lambda: openBuilding([x, y]))
 
     return gameData, AccountErrors.PASSED
 
@@ -186,6 +190,10 @@ def loadSave(username: str, password: str):
 def locChange(newVal):
     global V_LOC
     V_LOC = newVal
+
+
+def openBuilding(cords: list[int, int]):
+    pass
 
 
 def login(gameData):
