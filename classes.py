@@ -49,7 +49,7 @@ def loadSave(username: str, password: str):
     classField: list[list[Button]] = [[[None, Buildings.EMPTY]]*len(gameData["field"][0])]*len(gameData["field"])
     for x, column in enumerate(dictField):
         for y, elem in enumerate(column):
-            classField[x][y][0] = Button(list(offset+[x*buttonSize[0], y*buttonSize[1]]), buttonSize, (255, 200, 140), (255, 200, 140), onClick=lambda: openBuilding([x, y]))
+            classField[x][y][0] = Button(list(offset+[x*buttonSize[0], y*buttonSize[1]]), buttonSize, (255, 200, 140), (255, 200, 140))
     
     gameData["field"] = classField
 
