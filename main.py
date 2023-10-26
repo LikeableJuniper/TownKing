@@ -123,8 +123,8 @@ def mainGame(gameData):
                 V_LOC = -1
 
 
-def window(gameData, windowData, logic: Logic):
-    """Renders the login window. Returns gameData after closing."""
+def window(gameData, windowData, logic: Logic, windowLocation: int):
+    """Renders a window with specified data. Returns gameData after closing."""
     global V_LOC
     inputFields: list[Input] = windowData["inputFields"]
     lastFocused = 0 # Index of last focused on input field
@@ -133,7 +133,7 @@ def window(gameData, windowData, logic: Logic):
 
     buttons: list[Button] = windowData["buttons"]
 
-    while V_LOC == Locations.LOGIN:
+    while V_LOC == windowLocation:
         screen.fill((100, 100, 100))
         mousePos = pg.mouse.get_pos()
         lclick = pg.mouse.get_pressed()[0]
@@ -184,6 +184,6 @@ locationLogic = [Logic(True, False), Logic(False, True)]
 windowData = [{"inputFields": [Input([500, 150], [150, 50], (200, 200, 100), "Name: "), Input([800, 150], [150, 50], (200, 200, 100), "Pswd: ")], "labels": [Label([500, 310], "")], "buttons": [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT), Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE), Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)]}, {"inputFields": [], "labels": [], "buttons": []}]
 
 while V_LOC > Locations.EXIT: # When V_LOC reaches -1, exit the game
-    gameData = window(gameData, windowData[V_LOC], locationLogic[V_LOC])
+    gameData = window(gameData, windowData[V_LOC], locationLogic[V_LOC], V_LOC)
 
 print(gameData)
