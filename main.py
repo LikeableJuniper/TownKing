@@ -181,7 +181,7 @@ def window(gameData, windowData, logic: Logic, windowLocation: int):
 
 locationFuncs = [login, mainGame]
 locationLogic = [Logic(True, False), Logic(False, True)]
-windowData = [{"inputFields": [Input([500, 150], [150, 50], (200, 200, 100), "Name: "), Input([800, 150], [150, 50], (200, 200, 100), "Pswd: ")], "labels": [Label([500, 310], "")], "buttons": [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT), Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE), Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)]}, {"inputFields": [], "labels": [], "buttons": []}]
+windowData = [{"inputFields": [Input([500, 150], [150, 50], (200, 200, 100), "Name: "), Input([800, 150], [150, 50], (200, 200, 100), "Pswd: ")], "labels": [Label([500, 310], "")], "buttons": [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT), Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE), Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)]}, {"inputFields": [], "labels": [], "buttons": [Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)]}]
 
 while V_LOC > Locations.EXIT: # When V_LOC reaches -1, exit the game
     gameData = window(gameData, windowData[V_LOC], locationLogic[V_LOC], V_LOC)
