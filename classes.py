@@ -47,9 +47,10 @@ def loadSave(username: str, password: str):
     # Load button element in "field" as class from dict
     dictField = gameData["field"]
     classField: list[list[Button]] = [[[None, Buildings.EMPTY]]*len(gameData["field"][0])]*len(gameData["field"])
-    for x, column in enumerate(dictField):
-        for y, elem in enumerate(column):
-            classField[x][y][0] = Button(list(offset+[x*buttonSize[0], y*buttonSize[1]]), buttonSize, (255, 200, 140), (255, 200, 140))
+    for x in range(len(gameData["field"])):
+        classField.append([])
+        for y in range(len(gameData["field"][0])):
+            classField[x].append([Button(list(offset+[x*buttonSize[0], y*buttonSize[1]]), buttonSize, (255, 200, 140), (255, 200, 140)), 0])
     
     gameData["field"] = classField
 
@@ -105,7 +106,9 @@ class Button(Rectangle):
             if self.buttonType == ButtonTypes.CREATESAVE:
                 return createSave(kwargs["username"], kwargs["password"]) + tuple([kwargs["location"]])
             elif self.buttonType == ButtonTypes.LOADSAVE:
-                return loadSave(kwargs["username"], kwargs["password"]) + tuple([Locations.GAME])
+                returnVal = loadSave(kwargs["username"], kwargs["password"]) + tuple([Locations.GAME])
+                print(returnVal[0]["field"][0][0][0].pos)
+                return returnVal
             elif self.buttonType == ButtonTypes.EXIT:
                 return kwargs["gameData"], 0, Locations.EXIT
         return kwargs["gameData"], 0, kwargs["location"]
