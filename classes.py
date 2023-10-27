@@ -59,8 +59,8 @@ def loadSave(username: str, password: str):
 class Logic:
     def __init__(self, submitCredentials, renderField):
         """Class to hold booleans, defining whether or not a certain part of the loop should be executed during the "window" function."""
-        self.submitCredentials = submitCredentials
-        self.renderField = renderField
+        self.submitCredentials: bool = submitCredentials
+        self.renderField: bool = renderField
 
 
 class Rectangle:
