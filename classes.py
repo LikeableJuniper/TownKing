@@ -13,8 +13,10 @@ numbers = list("0123456789")
 
 fieldSize = [20, 20]
 fieldDimensions = [600, 600]
-offset = Vector(100, 300)
+offset = Vector(100, 100)
 buttonSize = [fieldDimensions[i]/fieldSize[i] for i in range(2)]
+buttonMargin = [5, 5]
+buttonWidth = (Vector(buttonMargin) + Vector(buttonSize)).components
 
 
 def createSave(username: str, password: str):
@@ -45,14 +47,15 @@ def loadSave(username: str, password: str):
     if sha256(bytes(password.encode())).hexdigest() != gameData["password"]:
         return None, AccountErrors.PASSWORD_INCORRECT
     # Load button element in "field" as class from dict
-    dictField = gameData["field"]
-    classField: list[list[Button]] = [[[None, Buildings.EMPTY]]*len(gameData["field"][0])]*len(gameData["field"])
+    classField: list[list[Button]] = []
     for x in range(len(gameData["field"])):
         classField.append([])
         for y in range(len(gameData["field"][0])):
-            classField[x].append([Button(list(offset+[x*buttonSize[0], y*buttonSize[1]]), buttonSize, (255, 200, 140), (255, 200, 140)), 0])
+            classField[x].append([Button(list(offset+[x*buttonWidth[0], y*buttonWidth[1]]), buttonSize, (255, 200, 140), (255, 255, 160)), 0])
     
     gameData["field"] = classField
+
+    print(gameData)
 
     return gameData, AccountErrors.PASSED
 
@@ -112,6 +115,9 @@ class Button(Rectangle):
             elif self.buttonType == ButtonTypes.EXIT:
                 return kwargs["gameData"], 0, Locations.EXIT
         return kwargs["gameData"], 0, kwargs["location"]
+
+    def __repr__(self):
+        return "Button"
     
     def render(self, screen, mousePos):
         if self.pos[0] < mousePos[0] < self.pos[0] + self.dimensions[0] and self.pos[1] < mousePos[1] < self.pos[1] + self.dimensions[1]:
