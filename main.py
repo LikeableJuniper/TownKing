@@ -87,7 +87,7 @@ windowData = [
             Input([800, 150], [150, 50], (200, 200, 100), "Pswd: ")
         ],
         "labels": [
-            Label([500, 310], "")
+            Label([500, 310], "", (255, 50, 50))
         ],
         "buttons": [
             Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT),
