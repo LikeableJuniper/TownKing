@@ -151,6 +151,8 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
             gameData = errCode[0]
             if errCode[1] < 0:
                 labels[0].changeText(errorMessages[errCode[1]])
+            elif V_LOC == Locations.GAME:
+                labels[0].changeText()
 
     for label in labels:
         label.render(screen)
