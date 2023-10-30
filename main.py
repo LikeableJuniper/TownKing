@@ -123,7 +123,7 @@ def mainGame(gameData):
                 V_LOC = -1
 
 
-def window(gameData, windowData, logic: Logic, windowLocation: int, lastFocused: int):
+def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick: bool):
     """Renders a window with specified data. Returns gameData after closing."""
     global V_LOC
     inputFields: list[Input] = windowData["inputFields"]
@@ -137,10 +137,12 @@ def window(gameData, windowData, logic: Logic, windowLocation: int, lastFocused:
     screen.fill((100, 100, 100))
     mousePos = pg.mouse.get_pos()
     lclick = pg.mouse.get_pressed()[0]
+    if lclick and not lastFrameClick:
+        print("lclick registered")
 
     for button in buttons:
         button.render(screen, mousePos)
-        if lclick:
+        if lclick and not lastFrameClick:
             kwargs = {"gameData": gameData, "location": V_LOC}
             if logic.submitCredentials:
                 kwargs["username"] = inputFields[0].value
@@ -182,7 +184,7 @@ def window(gameData, windowData, logic: Logic, windowLocation: int, lastFocused:
         if event.type == pg.QUIT:
             V_LOC = Locations.EXIT
         
-    return gameData, lastFocused
+    return gameData, lastFocused, lclick
 
 
 locationLogic = [Logic(True, False), Logic(False, True)]
@@ -213,9 +215,10 @@ windowData = [
     }
 ]
 lastFocused = 0
+lastFrameClick = False
 
 while V_LOC > Locations.EXIT: # When V_LOC reaches -1, exit the game
-    gameData, lastFocused = window(gameData, windowData[V_LOC], locationLogic[V_LOC], V_LOC, lastFocused)
+    gameData, lastFocused, lastFrameClick = window(gameData, windowData[V_LOC], locationLogic[V_LOC], lastFocused, lastFrameClick)
 
 
 print(gameData)

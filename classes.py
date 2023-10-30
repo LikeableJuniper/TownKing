@@ -111,8 +111,11 @@ class Button(Rectangle):
             if self.buttonType == ButtonTypes.CREATESAVE:
                 return createSave(kwargs["username"], kwargs["password"]) + tuple([kwargs["location"]])
             elif self.buttonType == ButtonTypes.LOADSAVE:
-                returnVal = loadSave(kwargs["username"], kwargs["password"]) + tuple([Locations.GAME])
-                print(returnVal[0]["field"][0][0][0].pos)
+                returnVal = loadSave(kwargs["username"], kwargs["password"])
+                if returnVal[1] < AccountErrors.PASSED:
+                    returnVal += tuple([Locations.LOGIN])
+                else:
+                    returnVal += tuple([Locations.GAME])
                 return returnVal
             elif self.buttonType == ButtonTypes.EXIT:
                 return kwargs["gameData"], 0, Locations.EXIT
