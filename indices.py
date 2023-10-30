@@ -10,6 +10,7 @@ class ButtonTypes:
     EXIT = 3
 
 class AccountErrors:
+    CREATED = 1
     PASSED = 0
     EMPTY_CREDENTIALS = -1
     USER_EXISTS = -2

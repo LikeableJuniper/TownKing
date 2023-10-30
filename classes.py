@@ -37,7 +37,7 @@ def createSave(username: str, password: str):
                 field[x].append([None, Buildings.EMPTY]) # None is a placeholder for button element during main loop
         saveData = {"username": username, "password": str(sha256(bytes(password.encode())).hexdigest()), "field": field}
         json.dump(saveData, f)
-    return None, AccountErrors.PASSED
+    return None, AccountErrors.CREATED
 
 
 def loadSave(username: str, password: str):
