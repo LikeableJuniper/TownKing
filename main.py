@@ -137,8 +137,6 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
     screen.fill((100, 100, 100))
     mousePos = pg.mouse.get_pos()
     lclick = pg.mouse.get_pressed()[0]
-    if lclick and not lastFrameClick:
-        print("lclick registered")
 
     for button in buttons:
         button.render(screen, mousePos)
