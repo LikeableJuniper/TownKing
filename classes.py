@@ -11,11 +11,11 @@ font = pg.font.Font(None, 25)
 alphabet = [list("abcdefghijklmnopqrstuvwxyz"), list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
 numbers = list("0123456789")
 
-fieldSize = [20, 20]
+fieldSize = [10, 10]
 fieldDimensions = [600, 600]
 offset = Vector(100, 100)
-buttonSize = [fieldDimensions[i]/fieldSize[i] for i in range(2)]
 buttonMargin = [5, 5]
+buttonSize = [fieldDimensions[i]/fieldSize[i]for i in range(2)]
 buttonWidth = (Vector(buttonMargin) + Vector(buttonSize)).components
 
 
