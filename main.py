@@ -147,12 +147,8 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
                 kwargs["password"] = inputFields[1].value
 
             errCode = button(kwargs=kwargs)
-            try:
-                V_LOC = errCode[2]
-                gameData = errCode[0]
-            except IndexError:
-                print(errCode)
-                exit()
+            V_LOC = errCode[2]
+            gameData = errCode[0]
             if errCode[1] < 0:
                 labels[0].changeText(errorMessages[errCode[1]])
 
