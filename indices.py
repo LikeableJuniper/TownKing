@@ -9,7 +9,7 @@ class ButtonTypes:
     LOADSAVE = 2
     EXIT = 3
 
-class AccountErrors:
+class AccountFeedbacks:
     CREATED = 1
     PASSED = 0
     EMPTY_CREDENTIALS = -1

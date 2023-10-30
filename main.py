@@ -47,8 +47,8 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
             gameData = errCode[0]
             if errCode[1] < 0:
                 labels[0].changeText(errorMessages[errCode[1]])
-            if errCode[1] == AccountErrors.CREATED:
-                labels[0].changeText("Successfully created account.", customColor=(50, 255, 255))
+            if errCode[1] == AccountFeedbacks.CREATED:
+                labels[0].changeText("Successfully created account.", customColor=(50, 255, 50))
 
     for label in labels:
         label.render(screen)

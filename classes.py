@@ -21,14 +21,14 @@ buttonSize = [(fieldDimensions[i]-((fieldSize[i]-1)*buttonMargin[i]))/fieldSize[
 buttonWidth = (Vector(buttonMargin) + Vector(buttonSize)).components
 
 
-def createSave(username: str, password: str):
+def createFile(username: str, password: str):
     """Function to create a save in "Saves/" directory. Returns data in the following format: (function value, error code)"""
     if not (username and password):
-        return None, AccountErrors.EMPTY_CREDENTIALS
+        return None, AccountFeedbacks.EMPTY_CREDENTIALS
     if not os.path.isdir("Saves"):
         os.mkdir("Saves")
     if f"{username}.json" in os.listdir("Saves"):
-        return None, AccountErrors.USER_EXISTS
+        return None, AccountFeedbacks.USER_EXISTS
     with open(f"Saves/{username}.json", "x") as f:
         field = []
         for x in range(fieldSize[0]):
@@ -37,17 +37,17 @@ def createSave(username: str, password: str):
                 field[x].append([None, Buildings.EMPTY]) # None is a placeholder for button element during main loop
         saveData = {"username": username, "password": str(sha256(bytes(password.encode())).hexdigest()), "field": field}
         json.dump(saveData, f)
-    return None, AccountErrors.CREATED
+    return None, AccountFeedbacks.CREATED
 
 
-def loadSave(username: str, password: str):
+def loadFile(username: str, password: str):
     """Function to load a save. Returns data in the following format: (function value, error code)"""
     if f"{username}.json" not in os.listdir("Saves"):
-        return None, AccountErrors.NO_SAVE
+        return None, AccountFeedbacks.NO_SAVE
     with open(f"Saves/{username}.json", "r") as f:
         gameData = json.load(f)
     if sha256(bytes(password.encode())).hexdigest() != gameData["password"]:
-        return None, AccountErrors.PASSWORD_INCORRECT
+        return None, AccountFeedbacks.PASSWORD_INCORRECT
     # Load button element in "field" as class from dict
     classField: list[list[Button]] = []
     for x in range(len(gameData["field"])):
@@ -59,7 +59,7 @@ def loadSave(username: str, password: str):
 
     print(gameData)
 
-    return gameData, AccountErrors.PASSED
+    return gameData, AccountFeedbacks.PASSED
 
 
 class Logic:
@@ -116,10 +116,10 @@ class Button(Rectangle):
         kwargs = kwargs["kwargs"]
         if self.hovered:
             if self.buttonType == ButtonTypes.CREATESAVE:
-                return createSave(kwargs["username"], kwargs["password"]) + tuple([kwargs["location"]])
+                return createFile(kwargs["username"], kwargs["password"]) + tuple([kwargs["location"]])
             elif self.buttonType == ButtonTypes.LOADSAVE:
-                returnVal = loadSave(kwargs["username"], kwargs["password"])
-                if returnVal[1] < AccountErrors.PASSED:
+                returnVal = loadFile(kwargs["username"], kwargs["password"])
+                if returnVal[1] < AccountFeedbacks.PASSED:
                     returnVal += tuple([Locations.LOGIN])
                 else:
                     returnVal += tuple([Locations.GAME])
