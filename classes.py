@@ -15,7 +15,9 @@ fieldSize = [10, 10]
 fieldDimensions = [600, 600]
 offset = Vector(100, 100)
 buttonMargin = [5, 5]
-buttonSize = [fieldDimensions[i]/fieldSize[i]for i in range(2)]
+# How big a button is displayed
+buttonSize = [(fieldDimensions[i]-((fieldSize[i]-1)*buttonMargin[i]))/fieldSize[i] for i in range(2)]
+# How much space a button actually occupies
 buttonWidth = (Vector(buttonMargin) + Vector(buttonSize)).components
 
 
