@@ -77,21 +77,28 @@ class Rectangle:
 
 
 class Label:
-    def __init__(self, pos, text):
+    def __init__(self, pos, text, color):
         """Label with text disappearing after 3000 frames from last change."""
         self.pos = pos
         self.text = text
         self.lastChange = 0 # How many frames since the value was last changed
+        self.originalColor = color
+        self.color = color
     
     def render(self, screen: pg.Surface):
         self.lastChange += 1
-        if self.lastChange >= 3000: self.text = ""
+        if self.lastChange >= 3000:
+            self.text = ""
+            self.color = self.originalColor
         if self.text:
-            screen.blit(font.render(self.text, False, (255, 50, 50)), self.pos)
+            screen.blit(font.render(self.text, False, self.color), self.pos)
     
-    def changeText(self, newText):
+    def changeText(self, newText, customColor=None):
+        # isPositive indicates whether a message to be displayed on this label has a positive meaning (e.g. successful account creation)
         self.text = newText
         self.lastChange = 0
+        if customColor:
+            self.color = customColor
 
 
 class Button(Rectangle):
