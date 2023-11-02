@@ -2,6 +2,7 @@ class Locations:
     EXIT = -1 # Anytime V_LOC is set to -1, exit the game
     LOGIN = 0
     GAME = 1
+    BUILDING = 2
 
 class ButtonTypes:
     DEFAULT = 0

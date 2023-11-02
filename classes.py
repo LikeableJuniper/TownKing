@@ -63,11 +63,11 @@ def loadFile(username: str, password: str):
 
 
 class Logic:
-    def __init__(self, submitCredentials, renderField):
+    def __init__(self, submitCredentials=False, renderField=False, renderBuilding=False):
         """Class to hold booleans, defining whether or not a certain part of the loop should be executed during the "window" function."""
         self.submitCredentials: bool = submitCredentials
         self.renderField: bool = renderField
-
+        self.renderBuilding: bool = renderBuilding
 
 class Rectangle:
     def __init__(self, pos: list[int, int], dimensions: list[int, int], color):

@@ -12,11 +12,14 @@ V_LOC = 0
 errorMessages = ["The password is incorrect.", "No save exists with that username.", "That username is already taken.", "Username or password cannot be empty."]
 
 # Format of "gameData" may vary during runtime so no useful type hints are available.
-gameData = {}
+gameData = {}  
 
 
-def openBuilding(cords: list[int, int]):
-    pass
+def createBuildingData(gameData, coords: list[int]) -> dict[list[Input], list[Label], list[Button]]:
+    """Creates a dict to be submitted to "window()" as "windowData" from two coordinates on the field."""
+    data = {"inputFields": [], "labels": [], "buttons": []}
+    field = gameData["field"]
+    
 
 
 def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick: bool):
@@ -79,7 +82,7 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
     return gameData, lastFocused, lclick
 
 
-locationLogic = [Logic(True, False), Logic(False, True)]
+locationLogic = [Logic(submitCredentials=True), Logic(renderField=True), Logic(renderBuilding=True)]
 windowData = [
     {
         "inputFields": [
@@ -95,7 +98,8 @@ windowData = [
             Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)
             ]
     },
-    {"inputFields": [
+    {
+        "inputFields": [
 
     ],
     "labels": [
@@ -104,7 +108,18 @@ windowData = [
     "buttons": [
         Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
         ]
-    }
+    },
+    {
+        "inputFields": [
+
+    ],
+    "labels": [
+
+    ],
+    "buttons": [
+        Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
+        ]
+    },
 ]
 lastFocused = 0
 lastFrameClick = False
