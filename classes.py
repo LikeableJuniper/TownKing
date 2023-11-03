@@ -70,7 +70,7 @@ class Logic:
         self.renderBuilding: bool = renderBuilding
 
 class Rectangle:
-    def __init__(self, pos: list[int, int], dimensions: list[int, int], color):
+    def __init__(self, pos: list[int, int], dimensions: list[int, int], color=None):
         self.pos = pos
         self.dimensions = dimensions
         self.color = color
@@ -102,9 +102,7 @@ class Label:
 
 
 class Button(Rectangle):
-    def __init__(self, pos=[], dimensions=[], color=(), hoverColor=(), text="", onClick=lambda: None, buttonType=ButtonTypes.DEFAULT, dictValue: dict=None):
-        if dictValue:
-            pos, dimensions, color, hoverColor, text, onClick, buttonType = dictValue.values()
+    def __init__(self, pos=[], dimensions=[], color=(), hoverColor=(), text="", onClick=lambda: None, buttonType=ButtonTypes.DEFAULT):
         super().__init__(pos, dimensions, color)
         self.hoverColor = hoverColor
         self.text = text
@@ -186,3 +184,12 @@ class Input(Rectangle):
         if self.pos[0] < mousePos[0] < self.pos[0] + self.dimensions[0] and self.pos[1] < mousePos[1] < self.pos[1] + self.dimensions[1]:
             return True
 
+
+class Image(Rectangle):
+    def __init__(self, pos, dimensions, path):
+        super().__init__(pos, dimensions)
+        self.imageObject = pg.transform.scale(pg.image.load(path), self.dimensions).convert_alpha()
+        self.rectData = (Vector(self.pos)+Vector(self.dimensions)).components
+
+    def render(self, screen: pg.Surface):
+        screen.blit(self.imageObject, (self.pos, self.rectData))

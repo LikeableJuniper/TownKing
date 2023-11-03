@@ -17,27 +17,37 @@ gameData = {}
 
 def createBuildingData(gameData, coords: list[int]) -> dict[list[Input], list[Label], list[Button]]:
     """Creates a dict to be submitted to "window()" as "windowData" from two coordinates on the field."""
-    data = {"inputFields": [], "labels": [], "buttons": []}
+    data = {
+        "inputFields": [
+
+    ],
+    "labels": [
+
+    ],
+    "buttons": [
+        Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
+        ]
+    }
     field = gameData["field"]
+    if field[coords[0]][coords[1]][1]:
+        pass    
     
 
 
 def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick: bool):
     """Renders a window with specified data. Returns gameData after closing."""
     global V_LOC
-    inputFields: list[Input] = windowData["inputFields"]
     if lastFocused >= len(inputFields):
         lastFocused = 0
-
-    labels: list[Label] = windowData["labels"]
-
-    buttons: list[Button] = windowData["buttons"]
 
     screen.fill((100, 100, 100))
     mousePos = pg.mouse.get_pos()
     lclick = pg.mouse.get_pressed()[0]
 
-    for button in buttons:
+    for image in windowData["images"]:
+        image.render(screen)
+
+    for button in windowData["buttons"]:
         button.render(screen, mousePos)
         if lclick and not lastFrameClick:
             kwargs = {"gameData": gameData, "location": V_LOC}
@@ -53,7 +63,7 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
             if errCode[1] == AccountFeedbacks.CREATED:
                 labels[0].changeText("Successfully created account.", customColor=(50, 255, 50))
 
-    for label in labels:
+    for label in windowData["labels"]:
         label.render(screen)
         
     if logic.renderField:
@@ -62,7 +72,7 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
                 row[0].render(screen, mousePos)
         
     pressed = pg.key.get_pressed()
-    for i, inputField in enumerate(inputFields):
+    for i, inputField in enumerate(windowData["inputFields"]):
         inputField.render(screen)
         if lclick:
             if inputField.checkClicked(mousePos):
@@ -96,17 +106,9 @@ windowData = [
             Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT),
             Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE),
             Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)
-            ]
-    },
-    {
-        "inputFields": [
-
-    ],
-    "labels": [
-
-    ],
-    "buttons": [
-        Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
+        ],
+        "images": [
+            Image((300, 300), (50, 50), path="Images/town_hall.png")
         ]
     },
     {
@@ -118,7 +120,10 @@ windowData = [
     ],
     "buttons": [
         Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
-        ]
+    ],
+    "images": [
+
+    ]
     },
 ]
 lastFocused = 0
