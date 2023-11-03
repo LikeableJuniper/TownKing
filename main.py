@@ -5,6 +5,8 @@ from classes import *
 pg.init()
 pg.font.init()
 screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+screensize = screen.get_size()
+screencenter = (Vector(screensize)/2).components
 
 V_LOC = 0
 
@@ -29,15 +31,17 @@ def createBuildingData(gameData, coords: list[int]) -> dict[list[Input], list[La
         ]
     }
     field = gameData["field"]
-    if field[coords[0]][coords[1]][1]:
-        pass    
+    if field[coords[0]][coords[1]][1] > Buildings.EMPTY:
+        # Center image
+        
+        field["images"].append(Image())
     
 
 
 def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick: bool):
     """Renders a window with specified data. Returns gameData after closing."""
     global V_LOC
-    if lastFocused >= len(inputFields):
+    if lastFocused >= len(windowData["inputFields"]):
         lastFocused = 0
 
     screen.fill((100, 100, 100))
@@ -52,16 +56,16 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
         if lclick and not lastFrameClick:
             kwargs = {"gameData": gameData, "location": V_LOC}
             if logic.submitCredentials:
-                kwargs["username"] = inputFields[0].value
-                kwargs["password"] = inputFields[1].value
+                kwargs["username"] = windowData["inputFields"][0].value
+                kwargs["password"] = windowData["inputFields"][1].value
 
             errCode = button(kwargs=kwargs)
             V_LOC = errCode[2]
             gameData = errCode[0]
             if errCode[1] < 0:
-                labels[0].changeText(errorMessages[errCode[1]])
+                windowData["labels"][0].changeText(errorMessages[errCode[1]])
             if errCode[1] == AccountFeedbacks.CREATED:
-                labels[0].changeText("Successfully created account.", customColor=(50, 255, 50))
+                windowData["labels"][0].changeText("Successfully created account.", customColor=(50, 255, 50))
 
     for label in windowData["labels"]:
         label.render(screen)
@@ -108,22 +112,22 @@ windowData = [
             Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)
         ],
         "images": [
-            Image((300, 300), (50, 50), path="Images/town_hall.png")
+
         ]
     },
     {
         "inputFields": [
 
-    ],
-    "labels": [
+        ],
+        "labels": [
 
-    ],
-    "buttons": [
-        Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
-    ],
-    "images": [
+        ],
+        "buttons": [
+            Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
+        ],
+        "images": [
 
-    ]
+        ]
     },
 ]
 lastFocused = 0
