@@ -67,6 +67,7 @@ class Logic:
         self.renderField: bool = renderField
         self.renderBuilding: bool = renderBuilding
 
+
 class Rectangle:
     def __init__(self, pos: list[int, int], dimensions: list[int, int], color=None):
         self.pos = pos
@@ -111,6 +112,7 @@ class Button(Rectangle):
         """Calls on every click. If mouse cursor is hovering over current button, run its "onClick" function. Returns data in the following format: gameData, error code, new location(may stay unchanged)"""
         kwargs = kwargs["kwargs"]
         if self.hovered:
+            print("was clicked, type: {}".format(self.buttonType))
             if self.buttonType == ButtonTypes.CREATESAVE:
                 return createFile(kwargs["username"], kwargs["password"]) + tuple([kwargs["location"]])
             elif self.buttonType == ButtonTypes.LOADSAVE:
@@ -122,12 +124,13 @@ class Button(Rectangle):
                 return returnVal
             elif self.buttonType == ButtonTypes.EXIT:
                 return kwargs["gameData"], 0, Locations.EXIT
-            elif self.buttontype == ButtonTypes.OPENBUILDING:
+            elif self.buttonType == ButtonTypes.OPENBUILDING:
+                print("opened Building")
                 return kwargs["gameData"], 0, Locations.BUILDING
         return kwargs["gameData"], 0, kwargs["location"]
 
     def __repr__(self):
-        return "Button"
+        return "Button, type: {}".format(self.buttonType)
     
     def render(self, screen, mousePos):
         if self.pos[0] < mousePos[0] < self.pos[0] + self.dimensions[0] and self.pos[1] < mousePos[1] < self.pos[1] + self.dimensions[1]:

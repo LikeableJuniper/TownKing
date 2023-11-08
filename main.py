@@ -54,6 +54,13 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
     for image in windowData["images"]:
         image.render(screen)
 
+        
+    if logic.renderField:
+        for x, column in enumerate(gameData["field"]):
+            for y, row in enumerate(column):
+                row[0].render(screen, mousePos)
+        windowData
+
     for button in windowData["buttons"]:
         button.render(screen, mousePos)
         if lclick and not lastFrameClick:
@@ -72,11 +79,6 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
 
     for label in windowData["labels"]:
         label.render(screen)
-        
-    if logic.renderField:
-        for x, column in enumerate(gameData["field"]):
-            for y, row in enumerate(column):
-                row[0].render(screen, mousePos)
         
     pressed = pg.key.get_pressed()
     for i, inputField in enumerate(windowData["inputFields"]):
@@ -139,3 +141,4 @@ lastFrameClick = False
 
 while V_LOC > Locations.EXIT: # When V_LOC reaches -1, exit the game
     gameData, lastFocused, lastFrameClick = window(gameData, windowData[V_LOC], locationLogic[V_LOC], lastFocused, lastFrameClick)
+print(gameData)
