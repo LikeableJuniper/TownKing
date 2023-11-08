@@ -53,11 +53,9 @@ def loadFile(username: str, password: str):
     for x in range(len(gameData["field"])):
         classField.append([])
         for y in range(len(gameData["field"][0])):
-            classField[x].append([Button(list(offset+[x*buttonWidth[0], y*buttonWidth[1]]), buttonSize, (255, 200, 140), (255, 255, 160)), 0])
+            classField[x].append([Button(list(offset+[x*buttonWidth[0], y*buttonWidth[1]]), buttonSize, (255, 200, 140), (255, 255, 160), buttonType=ButtonTypes.OPENBUILDING), Buildings.EMPTY])
     
     gameData["field"] = classField
-
-    print(gameData)
 
     return gameData, AccountFeedbacks.PASSED
 
@@ -124,6 +122,8 @@ class Button(Rectangle):
                 return returnVal
             elif self.buttonType == ButtonTypes.EXIT:
                 return kwargs["gameData"], 0, Locations.EXIT
+            elif self.buttontype == ButtonTypes.OPENBUILDING:
+                return kwargs["gameData"], 0, Locations.BUILDING
         return kwargs["gameData"], 0, kwargs["location"]
 
     def __repr__(self):

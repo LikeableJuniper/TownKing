@@ -9,6 +9,7 @@ class ButtonTypes:
     CREATESAVE = 1
     LOADSAVE = 2
     EXIT = 3
+    OPENBUILDING = 4
 
 class AccountFeedbacks:
     CREATED = 1
