@@ -53,24 +53,23 @@ def loadFile(username: str, password: str):
     for x in range(len(gameData["field"])):
         classField.append([])
         for y in range(len(gameData["field"][0])):
-            classField[x].append([Button(list(offset+[x*buttonWidth[0], y*buttonWidth[1]]), buttonSize, (255, 200, 140), (255, 255, 160)), 0])
+            classField[x].append([Button(list(offset+[x*buttonWidth[0], y*buttonWidth[1]]), buttonSize, (255, 200, 140), (255, 255, 160), buttonType=ButtonTypes.OPENBUILDING), Buildings.EMPTY])
     
     gameData["field"] = classField
-
-    print(gameData)
 
     return gameData, AccountFeedbacks.PASSED
 
 
 class Logic:
-    def __init__(self, submitCredentials, renderField):
+    def __init__(self, submitCredentials=False, renderField=False, renderBuilding=False):
         """Class to hold booleans, defining whether or not a certain part of the loop should be executed during the "window" function."""
         self.submitCredentials: bool = submitCredentials
         self.renderField: bool = renderField
+        self.renderBuilding: bool = renderBuilding
 
 
 class Rectangle:
-    def __init__(self, pos: list[int, int], dimensions: list[int, int], color):
+    def __init__(self, pos: list[int, int], dimensions: list[int, int], color=None):
         self.pos = pos
         self.dimensions = dimensions
         self.color = color
@@ -102,9 +101,7 @@ class Label:
 
 
 class Button(Rectangle):
-    def __init__(self, pos=[], dimensions=[], color=(), hoverColor=(), text="", onClick=lambda: None, buttonType=ButtonTypes.DEFAULT, dictValue: dict=None):
-        if dictValue:
-            pos, dimensions, color, hoverColor, text, onClick, buttonType = dictValue.values()
+    def __init__(self, pos=[], dimensions=[], color=(), hoverColor=(), text="", onClick=lambda: None, buttonType=ButtonTypes.DEFAULT):
         super().__init__(pos, dimensions, color)
         self.hoverColor = hoverColor
         self.text = text
@@ -115,6 +112,7 @@ class Button(Rectangle):
         """Calls on every click. If mouse cursor is hovering over current button, run its "onClick" function. Returns data in the following format: gameData, error code, new location(may stay unchanged)"""
         kwargs = kwargs["kwargs"]
         if self.hovered:
+            print("was clicked, type: {}".format(self.buttonType))
             if self.buttonType == ButtonTypes.CREATESAVE:
                 return createFile(kwargs["username"], kwargs["password"]) + tuple([kwargs["location"]])
             elif self.buttonType == ButtonTypes.LOADSAVE:
@@ -126,10 +124,13 @@ class Button(Rectangle):
                 return returnVal
             elif self.buttonType == ButtonTypes.EXIT:
                 return kwargs["gameData"], 0, Locations.EXIT
+            elif self.buttonType == ButtonTypes.OPENBUILDING:
+                print("opened Building")
+                return kwargs["gameData"], 0, Locations.BUILDING
         return kwargs["gameData"], 0, kwargs["location"]
 
     def __repr__(self):
-        return "Button"
+        return "Button, type: {}".format(self.buttonType)
     
     def render(self, screen, mousePos):
         if self.pos[0] < mousePos[0] < self.pos[0] + self.dimensions[0] and self.pos[1] < mousePos[1] < self.pos[1] + self.dimensions[1]:
@@ -186,3 +187,12 @@ class Input(Rectangle):
         if self.pos[0] < mousePos[0] < self.pos[0] + self.dimensions[0] and self.pos[1] < mousePos[1] < self.pos[1] + self.dimensions[1]:
             return True
 
+
+class Image(Rectangle):
+    def __init__(self, pos, dimensions, path):
+        super().__init__(pos, dimensions)
+        self.imageObject = pg.transform.scale(pg.image.load(path), self.dimensions).convert_alpha()
+        self.rectData = (Vector(self.pos)+Vector(self.dimensions)).components
+
+    def render(self, screen: pg.Surface):
+        screen.blit(self.imageObject, (self.pos, self.rectData))

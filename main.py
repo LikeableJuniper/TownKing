@@ -5,6 +5,8 @@ from classes import *
 pg.init()
 pg.font.init()
 screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
+screensize = screen.get_size()
+screencenter = (Vector(screensize)/2).components
 
 V_LOC = 0
 
@@ -12,54 +14,74 @@ V_LOC = 0
 errorMessages = ["The password is incorrect.", "No save exists with that username.", "That username is already taken.", "Username or password cannot be empty."]
 
 # Format of "gameData" may vary during runtime so no useful type hints are available.
-gameData = {}
+gameData = {}  
 
 
-def openBuilding(cords: list[int, int]):
-    pass
+def createBuildingData(gameData, coords: list[int]) -> dict[list[Input], list[Label], list[Button]]:
+    """Creates a dict to be submitted to "window()" as "windowData" from two coordinates on the field."""
+    data = {
+        "inputFields": [
+
+    ],
+    "labels": [
+
+    ],
+    "buttons": [
+        Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
+        ]
+    }
+    field = gameData["field"]
+    if (buildingId := field[coords[0]][coords[1]][1]) > Buildings.EMPTY:
+        # Center image
+        imageSize = [500, 500]
+        topLeft = (Vector(screencenter)-Vector(imageSize)/2).components
+        data["images"].append(Image(topLeft, imageSize, f"Images/{Buildings.names[buildingId]}.png"))
+    
+    return data
+    
 
 
 def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick: bool):
     """Renders a window with specified data. Returns gameData after closing."""
     global V_LOC
-    inputFields: list[Input] = windowData["inputFields"]
-    if lastFocused >= len(inputFields):
+    if lastFocused >= len(windowData["inputFields"]):
         lastFocused = 0
-
-    labels: list[Label] = windowData["labels"]
-
-    buttons: list[Button] = windowData["buttons"]
 
     screen.fill((100, 100, 100))
     mousePos = pg.mouse.get_pos()
     lclick = pg.mouse.get_pressed()[0]
 
-    for button in buttons:
-        button.render(screen, mousePos)
-        if lclick and not lastFrameClick:
-            kwargs = {"gameData": gameData, "location": V_LOC}
-            if logic.submitCredentials:
-                kwargs["username"] = inputFields[0].value
-                kwargs["password"] = inputFields[1].value
+    for image in windowData["images"]:
+        image.render(screen)
 
-            errCode = button(kwargs=kwargs)
-            V_LOC = errCode[2]
-            gameData = errCode[0]
-            if errCode[1] < 0:
-                labels[0].changeText(errorMessages[errCode[1]])
-            if errCode[1] == AccountFeedbacks.CREATED:
-                labels[0].changeText("Successfully created account.", customColor=(50, 255, 50))
-
-    for label in labels:
-        label.render(screen)
         
     if logic.renderField:
         for x, column in enumerate(gameData["field"]):
             for y, row in enumerate(column):
                 row[0].render(screen, mousePos)
+        windowData
+
+    for button in windowData["buttons"]:
+        button.render(screen, mousePos)
+        if lclick and not lastFrameClick:
+            kwargs = {"gameData": gameData, "location": V_LOC}
+            if logic.submitCredentials:
+                kwargs["username"] = windowData["inputFields"][0].value
+                kwargs["password"] = windowData["inputFields"][1].value
+
+            errCode = button(kwargs=kwargs)
+            V_LOC = errCode[2]
+            gameData = errCode[0]
+            if errCode[1] < 0:
+                windowData["labels"][0].changeText(errorMessages[errCode[1]])
+            if errCode[1] == AccountFeedbacks.CREATED:
+                windowData["labels"][0].changeText("Successfully created account.", customColor=(50, 255, 50))
+
+    for label in windowData["labels"]:
+        label.render(screen)
         
     pressed = pg.key.get_pressed()
-    for i, inputField in enumerate(inputFields):
+    for i, inputField in enumerate(windowData["inputFields"]):
         inputField.render(screen)
         if lclick:
             if inputField.checkClicked(mousePos):
@@ -79,7 +101,7 @@ def window(gameData, windowData, logic: Logic, lastFocused: int, lastFrameClick:
     return gameData, lastFocused, lclick
 
 
-locationLogic = [Logic(True, False), Logic(False, True)]
+locationLogic = [Logic(submitCredentials=True), Logic(renderField=True), Logic(renderBuilding=True)]
 windowData = [
     {
         "inputFields": [
@@ -93,24 +115,30 @@ windowData = [
             Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT),
             Button((500, 250), (150, 50), (30, 210, 170), (130, 255, 225), "Create Account", buttonType=ButtonTypes.CREATESAVE),
             Button([800, 250], [150, 50], (15, 75, 170), (80, 115, 170), "Log in", buttonType=ButtonTypes.LOADSAVE)
-            ]
-    },
-    {"inputFields": [
+        ],
+        "images": [
 
-    ],
-    "labels": [
-
-    ],
-    "buttons": [
-        Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
         ]
-    }
+    },
+    {
+        "inputFields": [
+
+        ],
+        "labels": [
+
+        ],
+        "buttons": [
+            Button((10, 10), (100, 30), (240, 30, 30), (240, 60, 60), "Exit", buttonType=ButtonTypes.EXIT)
+        ],
+        "images": [
+
+        ]
+    },
+    None # None signals for this set of data to be generated by "createBuildingData"
 ]
 lastFocused = 0
 lastFrameClick = False
 
 while V_LOC > Locations.EXIT: # When V_LOC reaches -1, exit the game
     gameData, lastFocused, lastFrameClick = window(gameData, windowData[V_LOC], locationLogic[V_LOC], lastFocused, lastFrameClick)
-
-
 print(gameData)
